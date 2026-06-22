@@ -1,4 +1,4 @@
-import os, json, io, re, requests
+import os, json, io, re, requests, httpx
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from pptx import Presentation
@@ -165,7 +165,7 @@ def get_youtube(brand):
 
 # ── Claude analysis ───────────────────────────────────────────
 def claude_analysis(brand, raw, yt):
-    client = anthropic.Anthropic(api_key=CLAUDE_KEY)
+    client = anthropic.Anthropic(api_key=CLAUDE_KEY, http_client=httpx.Client())
     yt_info = f"REAL YouTube: {yt['subscribers']} subscribers, {yt['views']} views, {yt['videos']} videos" if yt else "YouTube: estimate from research"
 
     prompt = f"""Brand intelligence report for "{brand}". Return ONLY valid JSON.
