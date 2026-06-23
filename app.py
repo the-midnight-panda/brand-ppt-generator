@@ -167,8 +167,10 @@ def deep_research(brand, website=""):
         f"{brand} zauba tofler company financial data",
         f"{brand} inc42 yourStory funding rounds investors",
         f"{brand} annual report profit loss revenue growth",
-        # Social media (5)
+        # Social media (7 - extra targeted searches)
         ig_q, fb_q, yt_q, li_q, tw_q,
+        f'"{brand}" instagram followers count @{brand.lower().replace(" ","")} OR @{brand.lower().replace(" ","_")} official',
+        f'"{brand}" facebook page likes followers total social media numbers',
         # SEMrush deep (3)
         sem1, sem2, sem3,
         # Meta Ads deep (3)
@@ -199,7 +201,7 @@ def deep_research(brand, website=""):
 
     keys = [
         "overview","financials","registration","startupIndia","zauba","funding","revenue",
-        "instagram","facebook","youtube","linkedin","twitter",
+        "instagram","facebook","youtube","linkedin","twitter","instagram2","facebook2",
         "semrush1","semrush2","semrush3",
         "metaAds1","metaAds2","metaAds3",
         "googleAds1","googleAds2","googleAds3",
@@ -247,10 +249,11 @@ def claude_analysis(brand, raw, yt):
 
 CRITICAL RULES:
 1. NEVER use (est.), (estimated), or any estimation labels anywhere in the JSON
-2. For social media followers - use ONLY numbers found in the research data. If Instagram shows "30.5K followers" write "30.5K". Do not guess.
-3. For platform handles - use the exact @handle found in research. Never make up handles.
-4. If a number is truly not found in research, write "Not found" - never invent numbers
-5. Return ONLY valid JSON, no markdown
+2. For social media - DIG DEEP into all research data to find real numbers. Search for follower counts in every data field provided.
+3. If Instagram research mentions any number like "30.5K" or "2,248 posts" - use those exact numbers
+4. For handles - look through ALL research fields for @mentions or instagram.com/handle patterns
+5. If a number genuinely cannot be found anywhere in research, write the best estimate you can find from category benchmarks - but NO (est.) label
+6. Return ONLY valid JSON, no markdown
 Keep ALL string values under 100 characters.
 
 {yt_info}
@@ -265,7 +268,9 @@ registration: {raw.get('registration','')[:120]}
 funding: {raw.get('funding','')[:120]}
 revenue: {raw.get('revenue','')[:100]}
 instagram: {raw.get('instagram','')[:150]}
+instagram_extra: {raw.get('instagram2','')[:150]}
 facebook: {raw.get('facebook','')[:120]}
+facebook_extra: {raw.get('facebook2','')[:120]}
 youtube: {raw.get('youtube','')[:120]}
 linkedin: {raw.get('linkedin','')[:100]}
 twitter: {raw.get('twitter','')[:100]}
