@@ -27,11 +27,12 @@
       color:var(--muted);font-weight:600;margin-bottom:12px}
     .brand-label{display:block;font-size:13px;color:var(--muted);font-weight:500;margin-bottom:10px}
     .brand-row{display:flex;gap:12px;align-items:stretch}
-    #brandName{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;
-      padding:14px 18px;font-size:16px;color:var(--text);font-family:'Inter',sans-serif;
-      outline:none;transition:border-color .2s}
-    #brandName:focus{border-color:var(--accent)}
-    #brandName::placeholder{color:var(--muted);opacity:.5}
+    .input-stack{display:flex;flex-direction:column;gap:10px;flex:1}
+    #brandName,#websiteUrl{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+      padding:14px 18px;font-size:15px;color:var(--text);font-family:'Inter',sans-serif;
+      outline:none;transition:border-color .2s;box-sizing:border-box}
+    #brandName:focus,#websiteUrl:focus{border-color:var(--accent)}
+    #brandName::placeholder,#websiteUrl::placeholder{color:var(--muted);opacity:.5}
     #generateBtn{background:linear-gradient(135deg,var(--accent),#9b8df8);color:#fff;
       border:none;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:600;
       font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;
@@ -85,7 +86,10 @@
     </div>
 
     <div class="brand-row">
-      <input type="text" id="brandName" placeholder="e.g. Sunpure, Zomato, Mamaearth..."/>
+      <div class="input-stack">
+        <input type="text" id="brandName" placeholder="Brand name — e.g. Sportico Resort, Zomato, Nike..."/>
+        <input type="text" id="websiteUrl" placeholder="Website URL — e.g. sporticoresorts.com (optional but recommended)"/>
+      </div>
       <button id="generateBtn" onclick="startGeneration()">Generate PPT →</button>
     </div>
 
@@ -135,7 +139,7 @@
 
   <script>
     // !! CHANGE THIS to your Railway URL after deployment !!
-    const BACKEND_URL = "https://web-production-03b3c.up.railway.app";
+    const BACKEND_URL = "https://YOUR-APP-NAME.railway.app";
 
     let pptBlob = null;
     let currentBrand = '';
@@ -173,6 +177,7 @@
 
     async function startGeneration() {
       const brand = document.getElementById('brandName').value.trim();
+      const website = document.getElementById('websiteUrl').value.trim();
       if (!brand) return showError('Please enter a brand name.');
 
       currentBrand = brand;
@@ -192,7 +197,7 @@
         const response = await fetch(`${BACKEND_URL}/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ brand }),
+          body: JSON.stringify({ brand, website }),
         });
 
         [timer1,timer2,timer3,timer4].forEach(clearTimeout);
