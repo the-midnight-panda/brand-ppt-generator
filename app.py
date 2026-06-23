@@ -137,7 +137,7 @@ def deep_research(brand, website=""):
     tw  = social.get("twitter", "")
 
     # Build targeted queries using real handles where found
-    ig_q  = f"instagram.com/{ig} followers engagement posts reels" if ig else f"{brand} instagram followers engagement posts 2025"
+    ig_q  = f"instagram.com/{ig} followers posts count" if ig else f"{brand} official instagram @handle followers count exact 2025"
     fb_q  = f"facebook.com/{fb} page followers likes posts" if fb else f"{brand} facebook page followers likes engagement"
     yt_q  = f"youtube.com/{yt} subscribers views videos" if yt else f"{brand} youtube channel subscribers views"
     li_q  = f"linkedin.com/company/{li} employees followers" if li else f"{brand} linkedin company followers employees"
@@ -243,8 +243,14 @@ def claude_analysis(brand, raw, yt):
     client = anthropic.Anthropic(api_key=CLAUDE_KEY, http_client=httpx.Client())
     yt_info = f"REAL YouTube: {yt['subscribers']} subscribers, {yt['views']} views, {yt['videos']} videos" if yt else "YouTube: estimate from research"
 
-    prompt = f"""Brand intelligence report for "{brand}". Return ONLY valid JSON.
-NEVER say "Data not available" - always estimate with (est.) label.
+    prompt = f"""You are a senior brand analyst. Create a brand intelligence report for "{brand}".
+
+CRITICAL RULES:
+1. NEVER use (est.), (estimated), or any estimation labels anywhere in the JSON
+2. For social media followers - use ONLY numbers found in the research data. If Instagram shows "30.5K followers" write "30.5K". Do not guess.
+3. For platform handles - use the exact @handle found in research. Never make up handles.
+4. If a number is truly not found in research, write "Not found" - never invent numbers
+5. Return ONLY valid JSON, no markdown
 Keep ALL string values under 100 characters.
 
 {yt_info}
@@ -821,10 +827,10 @@ def build_ppt(d, yt_real):
     add_divider(sSEM)
     sem = d.get("semrush_data", {})
     sem_metrics = [
-        ("Monthly Visits",    sem.get("monthly_visits","N/A (est.)"),   "Organic + Paid combined"),
-        ("Domain Rating",     sem.get("domain_rating","N/A (est.)"),    "Authority score out of 100"),
-        ("Organic Keywords",  sem.get("organic_keywords","N/A (est.)"), "Keywords ranking on Google"),
-        ("Total Backlinks",   sem.get("backlinks","N/A (est.)"),        "Referring domains count"),
+        ("Monthly Visits",    sem.get("monthly_visits","N/A"),   "Organic + Paid combined"),
+        ("Domain Rating",     sem.get("domain_rating","N/A"),    "Authority score out of 100"),
+        ("Organic Keywords",  sem.get("organic_keywords","N/A"), "Keywords ranking on Google"),
+        ("Total Backlinks",   sem.get("backlinks","N/A"),        "Referring domains count"),
     ]
     for i,(lbl,val,note) in enumerate(sem_metrics):
         col2, row = i%2, i//2
