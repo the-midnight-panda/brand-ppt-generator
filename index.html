@@ -139,7 +139,7 @@
 
   <script>
     // !! CHANGE THIS to your Railway URL after deployment !!
-    const BACKEND_URL = "https://YOUR-APP-NAME.railway.app";
+    const BACKEND_URL = "";  // Empty = same server (Railway serves both frontend and backend)
 
     let pptBlob = null;
     let currentBrand = '';
@@ -195,13 +195,18 @@
 
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout
+        const timeoutId = setTimeout(() => controller.abort(), 300000);
+
+        // First ping the server to wake it up
+        try { await fetch(`${BACKEND_URL}/health`); } catch(e) {}
+        await new Promise(r => setTimeout(r, 1000));
 
         const response = await fetch(`${BACKEND_URL}/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ brand, website }),
           signal: controller.signal,
+          mode: 'cors',
         });
 
         clearTimeout(timeoutId);
