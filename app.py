@@ -92,6 +92,63 @@ def search(query):
         return "\n".join(results)[:400] or "No results"
     except: return "Search unavailable"
 
+def scrape_instagram(handle):
+    """Directly scrape Instagram public page for real follower count"""
+    if not handle:
+        return {}
+    try:
+        handle = handle.strip('@').strip('/')
+        url = f"https://www.instagram.com/{handle}/"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+        }
+        r = requests.get(url, headers=headers, timeout=12)
+        html = r.text
+        import re
+        # Try to find follower count in page source
+        patterns = [
+            r'"edge_followed_by":\{"count":(\d+)\}',
+            r'"followers":(\d+)',
+            r'(\d+(?:\.\d+)?[KMk]?) [Ff]ollowers',
+            r'"follower_count":(\d+)',
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, html)
+            if match:
+                count = match.group(1)
+                # Convert K/M to number
+                if 'K' in str(count) or 'k' in str(count):
+                    num = float(str(count).replace('K','').replace('k','')) * 1000
+                    return {"followers": f"{num/1000:.1f}K", "handle": f"@{handle}"}
+                elif 'M' in str(count):
+                    num = float(str(count).replace('M','')) * 1000000
+                    return {"followers": f"{num/1000000:.1f}M", "handle": f"@{handle}"}
+                else:
+                    num = int(count)
+                    if num > 1000000:
+                        return {"followers": f"{num/1000000:.1f}M", "handle": f"@{handle}"}
+                    elif num > 1000:
+                        return {"followers": f"{num/1000:.1f}K", "handle": f"@{handle}"}
+                    else:
+                        return {"followers": str(num), "handle": f"@{handle}"}
+        print(f"[IG] Could not extract followers for @{handle}")
+        return {"handle": f"@{handle}"}
+    except Exception as e:
+        print(f"[IG] Scrape failed for {handle}: {e}")
+        return {}
+
+def find_instagram_handle(brand, website_socials):
+    """Find the real Instagram handle for a brand"""
+    # First check if website scraping found it
+    if website_socials.get("instagram"):
+        return website_socials["instagram"]
+    # Common handle patterns to try
+    clean = brand.lower().replace(" ","").replace(".","")
+    clean_underscore = brand.lower().replace(" ","_").replace(".","")
+    return None
+
 def scrape_website_socials(website):
     """Visit brand website and extract real social media links"""
     if not website:
@@ -135,6 +192,16 @@ def deep_research(brand, website=""):
     yt  = social.get("youtube", "")
     li  = social.get("linkedin", "")
     tw  = social.get("twitter", "")
+
+    # Directly scrape Instagram for REAL follower count
+    ig_real_data = {}
+    if ig:
+        print(f"[IG] Scraping real data for @{ig}")
+        ig_real_data = scrape_instagram(ig)
+        if ig_real_data.get("followers"):
+            print(f"[IG] Real followers: {ig_real_data['followers']}")
+            social["ig_followers"] = ig_real_data["followers"]
+            social["ig_posts"] = ig_real_data.get("posts", "")
 
     # Build targeted queries using real handles where found
     ig_q  = f"instagram.com/{ig} followers posts count" if ig else f"{brand} official instagram @handle followers count exact 2025"
@@ -249,16 +316,16 @@ def claude_analysis(brand, raw, yt):
 
 CRITICAL RULES:
 1. NEVER use (est.), (estimated), or any estimation labels anywhere in the JSON
-2. For social media - DIG DEEP into all research data to find real numbers. Search for follower counts in every data field provided.
-3. If Instagram research mentions any number like "30.5K" or "2,248 posts" - use those exact numbers
-4. For handles - look through ALL research fields for @mentions or instagram.com/handle patterns
-5. If a number genuinely cannot be found anywhere in research, write the best estimate you can find from category benchmarks - but NO (est.) label
-6. Return ONLY valid JSON, no markdown
+2. For Instagram followers - use EXACTLY the number from "REAL INSTAGRAM FOLLOWERS (DIRECTLY SCRAPED)" field above. This is the real verified number.
+3. For other platform handles and followers - use numbers found in research data
+4. If a number genuinely cannot be found, write your best estimate as a plain number without any label
+5. Return ONLY valid JSON, no markdown
 Keep ALL string values under 100 characters.
 
 {yt_info}
 
-REAL SOCIAL HANDLES: {raw.get('social_handles',{})}
+REAL SOCIAL HANDLES FOUND ON WEBSITE: {raw.get('social_handles',{})}
+REAL INSTAGRAM FOLLOWERS (DIRECTLY SCRAPED): {raw.get('social_handles',{}).get('ig_followers','Not scraped')}
 WEBSITE: {raw.get('domain','')}
 
 DATA:
