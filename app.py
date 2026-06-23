@@ -249,30 +249,42 @@ Keep ALL string values under 100 characters.
 
 {yt_info}
 
+REAL SOCIAL HANDLES: {raw.get('social_handles',{})}
+WEBSITE: {raw.get('domain','')}
+
 DATA:
-overview: {raw['overview'][:200]}
-financials: {raw['financials'][:150]}
-registration: {raw['registration'][:120]}
-instagram: {raw['instagram'][:100]}
-facebook: {raw['facebook'][:100]}
-youtube: {raw['youtube'][:100]}
-metaAds: {raw['metaAds'][:120]}
-semrush: {raw['semrush'][:100]}
-audience: {raw['audience'][:150]}
-competitors: {raw['competitors'][:150]}
-amazon: {raw['amazon'][:120]}
-flipkart: {raw['flipkart'][:100]}
-reddit: {raw['reddit'][:100]}
-quora: {raw['quora'][:100]}
-positives: {raw['positives'][:120]}
-negatives: {raw['negatives'][:120]}
-press: {raw['press'][:120]}
-funding: {raw['funding'][:120]}
-tam: {raw['tam'][:100]}
-swot: {raw['swot'][:120]}
-pricing: {raw['pricing'][:100]}
-quickcommerce: {raw['quickcommerce'][:100]}
-brandStory: {raw['brandStory'][:150]}
+overview: {raw.get('overview','')[:200]}
+financials: {raw.get('financials','')[:150]}
+registration: {raw.get('registration','')[:120]}
+funding: {raw.get('funding','')[:120]}
+revenue: {raw.get('revenue','')[:100]}
+instagram: {raw.get('instagram','')[:150]}
+facebook: {raw.get('facebook','')[:120]}
+youtube: {raw.get('youtube','')[:120]}
+linkedin: {raw.get('linkedin','')[:100]}
+twitter: {raw.get('twitter','')[:100]}
+semrush_traffic: {raw.get('semrush1','')[:200]}
+semrush_keywords: {raw.get('semrush2','')[:200]}
+semrush_backlinks: {raw.get('semrush3','')[:150]}
+meta_ads_library: {raw.get('metaAds1','')[:200]}
+meta_ads_creative: {raw.get('metaAds2','')[:200]}
+meta_ads_details: {raw.get('metaAds3','')[:150]}
+google_ads: {raw.get('googleAds1','')[:200]}
+google_ads_keywords: {raw.get('googleAds2','')[:150]}
+google_ads_strategy: {raw.get('googleAds3','')[:150]}
+audience: {raw.get('audience','')[:150]}
+competitors: {raw.get('competitors','')[:150]}
+tam: {raw.get('tam','')[:100]}
+swot: {raw.get('swot','')[:120]}
+amazon: {raw.get('amazon','')[:120]}
+flipkart: {raw.get('flipkart','')[:100]}
+trustpilot: {raw.get('trustpilot','')[:100]}
+reddit: {raw.get('reddit','')[:100]}
+positives: {raw.get('positives','')[:120]}
+negatives: {raw.get('negatives','')[:120]}
+pricing: {raw.get('pricing','')[:100]}
+press: {raw.get('press','')[:120]}
+marketing: {raw.get('marketing','')[:120]}
 
 Fill this JSON completely. Every field must have a real or estimated value:
 {{
